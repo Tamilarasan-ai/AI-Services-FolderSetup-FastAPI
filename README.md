@@ -90,6 +90,81 @@ python scripts/data_ingestion.py --source ./data/raw/new_data.csv
 
 ## Folder Structure
 
+### **File Structure Overview**
+
+```
+# Top-level directory for the AI service.
+# Example: videoscout_ai/, indiansalesrep_ai/
+{ai_service_name}/
+├── .github/workflows/                      # CI/CD: Automated builds, tests, and deployment
+│   └── main.yml
+│
+├── configs/                                # All service configurations
+│   ├── base.yaml                         # Default parameters (logging, model IDs, feature flags)
+│   └── production.yaml                   # Production-specific overrides (e.g., credentials, endpoints)
+│
+├── data/                                   # Sample data/schemas (use DVC for large files)
+│   ├── processed/
+│   └── raw/
+│
+├── notebooks/                              # Exploration and experimentation (NOT production code)
+│   └── poc.ipynb
+│
+├── scripts/                                # Helper scripts for one-off tasks
+│   ├── data_ingestion.py                 # Command: python scripts/data_ingestion.py --source <path>
+│   └── evaluate_model.py                 # Command: python scripts/evaluate_model.py --model-version <v1>
+│
+├── src/
+│   └── {ai_service_name}/                  # The core Python package for the service
+│       ├── __init__.py
+│       ├── api/                            # Dedicated module for all API-related logic
+│       │   ├── __init__.py
+│       │   ├── v1/                         # Version 1 of the API
+│       │   │   ├── __init__.py
+│       │   │   ├── endpoints.py            # FastAPI routers and endpoint logic
+│       │   │   └── schemas.py              # Pydantic models for API request/response
+│       │   └── main.py                     # Instantiates the FastAPI app and includes routers
+│       │
+│       ├── db/                             # Database clients, connections, and repositories
+│       │   ├── __init__.py
+│       │   ├── connection.py               # Manages connection pools to NoSQL & Vector DBs
+│       │   └── repository.py               # Handles all database operations (e.g., save conversation, query vectors)
+│       │
+│       ├── agents/                         # (Optional) Core agent logic, tools, and orchestration
+│       │   ├── __init__.py
+│       │   └── planner.py
+│       │
+│       ├── components/                     # Reusable, standalone ML building blocks
+│       │   ├── __init__.py
+│       │   ├── audio_processor.py          # Example: For IndianSalesRep
+│       │   └── web_scraper.py              # Example: For VideoScout
+│       │
+│       ├── pipeline/                       # Orchestrates components into end-to-end workflows
+│       │   ├── __init__.py
+│       │   └── prediction_pipeline.py      # The main logic flow for an inference request
+│       │
+│       ├── prompts.py                      # Centralized prompt templates
+│       └── utils.py                        # Common utility functions (e.g., loggers)
+│
+├── tests/                                  # All tests (unit, integration)
+│   ├── __init__.py
+│   ├── test_api.py
+│   └── test_pipeline.py
+│
+├── .dockerignore
+├── .gitignore
+│── .env.local              # Local environment variables
+│── .env.staging            # Staging environment variables
+│── .env.testing            # Testing environment variables
+│── .env.production         # Production environment variables
+│── docker-compose.yml      # Local dev docker setup
+├── Dockerfile                              # Defines the container. Command: docker build -t {ai_service_name} .
+├── main.py                                 # Root entry point. Command: uvicorn main:app --reload
+├── pyproject.toml                          # Project metadata and dependencies (preferred)
+└── README.md                               # Essential project documentation
+
+```
+
 This project follows a standardized folder structure to ensure consistency and maintainability across all AI services. Here's how to use it:
 
 -   `configs/`
